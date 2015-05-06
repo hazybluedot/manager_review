@@ -6,7 +6,7 @@ In the following example `assessment.csv` is the csv exported
 assesment data downloaded from Scholar Tests&Quizes and
 `gradebook.csv` is the exported gradebook with no structure, just
 grades. See the
-[Exporting data from Scholar](#exporting_data_from_scholar) section
+[Exporting data from Scholar](#exporting-data-from-scholar) section
 for instructions.
 
 ```
