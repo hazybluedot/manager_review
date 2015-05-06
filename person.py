@@ -1,5 +1,6 @@
 from util import num_or_string, issumable
-from gradebook import GradebookItem
+from scholar.gradebook import GradebookItem
+from exceptions import UniquePersonError
 
 class ReviewItem(GradebookItem):
     dimensions = [ 'interdependence', 'team planning', 'team dynamics', 'interpersonal relationships' ] 
