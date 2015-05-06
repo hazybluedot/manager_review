@@ -29,7 +29,7 @@ class GradebookScore:
         self.points = num_or_none(float,points)
         self.comments = comments
         
-class Person:
+class GradebookRow:
     def __init__(self, pid, name, section):
         self.student_id = pid
         self.student_name = name
@@ -128,7 +128,7 @@ def items_from_row(row, items):
     return { item.name: GradebookScore(row[item.label], row[item.comment_label]) for item in items }
         
 def record_from_row(row, items):
-    person = Person(row['Student Id'], row['Student Name'], row['Section'])
+    person = GradebookRow(row['Student Id'], row['Student Name'], row['Section'])
     for label in tail_headers:
         setattr(person, label_to_attr(label), row[label])
     person.items = items_from_row(row, items)
