@@ -70,6 +70,19 @@ above command results in an error replace `python.exe` with the
 
 ## Usage
 
+### Start with GUI
+
+The experimental GUI provides a convenient way for users to initialize
+the program and set the desired assessment CSV file and gradebook CSV
+file. After that and pressing *Go* the GUI invokes the command line
+program with the input and gradebook files set as well as the `-i` and
+`-c` options. Once you have entered the final score and comment the
+command line program will exit and grades and comments will be saved
+to the gradebook file you selected. Import that file into Scholar
+gradebook.
+
+### Start from the command line
+
 In the following example `assessment.csv` is the csv exported
 assesment data downloaded from Scholar Tests&Quizes and
 `gradebook.csv` is the exported gradebook with no structure, just
@@ -87,14 +100,17 @@ To record and include comments
 > python manager_review.py -ic -g gradebook.csv Assessment-Project#2_Team_Eval.csv
 ```
 
-If reviewers made typoes or missspellings when entering reviewee names
-you will be prompted for a name correction.  These correctons will be saved in a file called `alieases.txt` in the current directory, you can specify an alternate file using the `--aliases` command option.
+If reviewers made typos or spelling errors when entering reviewee names
+you will be prompted for a name correction.  These correctons will be
+saved in a file called `alieases.txt` in the current directory, you
+can specify an alternate file using the `--aliases` command option.
 
 ```
 > python3 manager_review.py -h
 ```
 
-Will display all available options
+Will display all available options.
+
 
 ## Exporting data from Scholar
 
