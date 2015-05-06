@@ -155,7 +155,7 @@ def prompt_for_score(review):
             stderr.write("'{}' is not a number\n".format(instructor_input))
         return instructor_score
 
-def prompt_for_comments(review):
+def prompt_for_comments(review, args):
     if args.comments:
         if len(review.comments.strip()) > 0:
             print('Current instructor comments: "{}"'.format(review.comments))
@@ -200,7 +200,7 @@ def collect_responses(responses, reviews, reviewee, gradebook, args):
                 review.instructor_points = instructor_score
 
             try:
-                instructor_comments = prompt_for_comments(review)
+                instructor_comments = prompt_for_comments(review, args)
             except (KeyboardInterrupt, EOFError):
                 print("")
                 return
