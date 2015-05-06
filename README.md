@@ -7,6 +7,11 @@
    of this repository by clicking the button on the right side of the
    page
 3. Extract the downloaded archive, open the folder that was created and double click `manager_review_gui.py`
+4. After browsing for the necessary input CSV and gradebook CSV files
+   and entering the correct gradebook item name, press 'Go'
+5. All subsequent input will be done through the command
+   window. During data entry you may press `Ctrl+C` and then `Enter`
+   to cancel and save any changes so far.
 
 ## Requirements
 
