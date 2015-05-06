@@ -4,21 +4,30 @@
 
 ### Python
 
-[Download](https://www.python.org/downloads/) and install
-the latest Python 3 release (currently this program is not compatible
-with Python 2) for your operating system. If on Windows
+[Download](https://www.python.org/downloads/) and install the latest
+Python 3 release (currently this program is not compatible with Python
+2) for your operating system. If on Windows be sure to select the
+option "Add python.exe to the search path" so that you don't need to
+specify the full path to the python executable when running it from
+the command line.
+
+### This program
+
+Download the zip archive by clicking the *Download ZIP* button to the
+right. Unpack the archive into a convenient directory, navigate to the
+directory containing `manager_review.py` at the command
+prompt. (Windows users, open a command prompt, type `cd` followed by a
+space, and then drag and drop the folder name containing
+`manager_review.py` into the command window and press `Enter`)
 
 ## Windows users
 
-You may have to specify the full path to the python executable when
-running python programs for the command line. For the latest released
-of Python 3 this should be `C:\Python34\python.exe`, so to run the
-program from the command line on windows navigate to the directory
-which you unzipped the archive and run (`>` denotes the command
-prompt, don't type that):
+If you added *python.exe* to the search path when installing Python
+you should be able to run the following command (`>` denotes the
+command prompt, don't type that):
 
 ```
-> C:\Python34\python.exe manager_review.py
+> python.exe manager_review.py
 ```
 
 If all is working you should see the help text for the program
@@ -29,6 +38,13 @@ usage: manager_review.py [-h] [--interactive] [--gradebook GRADEBOOK]
                          [--submission-points SUBMISSION_POINTS]
                          input_file
 ```
+
+If you did not add *python.exe* to the search path when you installed
+Python you will have to specify the full path to the python executable
+when running python programs for the command line. For the latest
+released of Python 3 this should be `C:\Python34\python.exe`. If the
+above command results in an error replace `python.exe` with the
+`C:\Python34\python.exe` and try again.
 
 ## Usage
 
