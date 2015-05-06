@@ -62,10 +62,10 @@ class Application(Frame):
         self.input_label = Label(self, text="input file").grid(row=0, sticky=W)
         self.gradebook_label = Label(self, text="gradebook file").grid(row=1, sticky=W)
 
-        self.input_button = Button(self, text="Browse for input file", command=self.set_input_file, width=10)  
+        self.input_button = Button(self, text="Browse", command=self.set_input_file, width=10)  
         self.input_button.grid(row=0, column=1, **button_opt)
 
-        self.gradebook_button = Button(self, text="Browse for gradebook file", command=self.set_gradebook_file, width=10)  
+        self.gradebook_button = Button(self, text="Browse", command=self.set_gradebook_file, width=10)  
         self.gradebook_button.grid(row=1, column=1, **button_opt)
 
         
