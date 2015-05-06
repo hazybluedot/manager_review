@@ -86,9 +86,7 @@ class ManagersReview(Person):
     @points.setter
     def points(self, total_points):
         total_points = float(total_points)
-        print("setting review points for {} to {}".format(self.full_name, total_points))
         self.instructor_points = total_points - (self.peer_score + self.submission_points)
-        print("\tsetting instructor points to {} - ({} + {})".format(total_points, self.peer_score, self.submission_points))
         
     def __repr__(self):
         representation = ""
@@ -175,7 +173,11 @@ def collect_responses(responses, reviews, reviewee, gradebook, args):
         print("record for {}".format(review.pid))
         record = [ record for record in gradebook.records if record.pid == review.pid][0]
         score = record.score_for(args.name)
-        review.points = score.points
+        try:
+            review.points = score.points
+        except TypeError:
+            pass
+        
         review.comments = score.comments
         
         print("{}".format(review.full_name))
