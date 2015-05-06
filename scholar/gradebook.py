@@ -167,7 +167,7 @@ class Gradebook:
         return fields
     
     def write(self, filename):
-        with open(filename, 'w') as f:
+        with open(filename, 'w', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=self.fieldnames)
             writer.writeheader()
             for record in self.records:
