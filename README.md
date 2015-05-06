@@ -20,6 +20,12 @@ prompt. (Windows users, open a command prompt, type `cd` followed by a
 space, and then drag and drop the folder name containing
 `manager_review.py` into the command window and press `Enter`)
 
+## Experimental GUI
+
+If you aren't feeling up for working from the command line try the
+experimental gui by running `manager_review_gui.py`. Yes, I know it
+looks really bad, if you want to make it pretty feel free to submit a pull request.
+
 ## Windows users
 
 If you added *python.exe* to the search path when installing Python
