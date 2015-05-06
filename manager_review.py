@@ -5,8 +5,8 @@ from itertools import groupby
 import textwrap
 from os import name as os_name
 
-from corrector import Corrector
-from person import people_finder
+from app.corrector import Corrector
+from app.person import people_finder
 from scholar import tests_quizzes as tq
 from scholar.gradebook import Gradebook
 from scholar.person import Person

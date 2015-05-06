@@ -1,6 +1,6 @@
 from util import num_or_string, issumable
 from scholar.gradebook import GradebookItem
-from exceptions import UniquePersonError
+from .exceptions import UniquePersonError
 
 class people_finder:
     """Find people by fuzzy matching names"""

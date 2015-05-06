@@ -10,7 +10,6 @@
 
 ## Requirements
 
-
 ### Python
 
 [Download](https://www.python.org/downloads/) and install the latest
