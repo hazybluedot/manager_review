@@ -176,7 +176,7 @@ def run(args):
                 try:
                     instructor_score = float(instructor_input)
                 except ValueError:
-                    sys.stderr.write("'{}' is not a number\n".format(instructor_input))
+                    stderr.write("'{}' is not a number\n".format(instructor_input))
             review.instructor_points = instructor_score
             if args.comments:
                 review.comments = input('Instructor comments for {}: '.format(review.full_name))
@@ -188,7 +188,7 @@ def run(args):
         try:
             gradebook = Gradebook(args.gradebook)
         except FileNotFoundError as e:
-            sys.stderr.write('No such file: {}\n'.format(args.gradebook))
+            stderr.write('No such file: {}\n'.format(args.gradebook))
         else:
             gradebook.update_item(args.name, reviews)
             gradebook.write(args.gradebook)
