@@ -149,7 +149,7 @@ class Gradebook:
         self.read(csvfile)
     
     def read(self, filename):
-        with open(filename, 'r', encoding="utf8") as f:
+        with open(filename, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             #self.has_comments = any([ gradebook_comment_regex.match(fieldname) for fieldname in reader.fieldnames ])
             self.items = gradebook_items_from_fieldnames(reader.fieldnames)
@@ -196,7 +196,7 @@ class Gradebook:
         return fields
     
     def write(self, filename):
-        with open(filename, 'w', newline='') as f:
+        with open(filename, 'w', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=self.fieldnames)
             writer.writeheader()
             for record in self.records:

@@ -77,7 +77,7 @@ class QuizSubmissions:
     def __init__(self, filename, **kwargs):
         self.rows = []
         print("opening quiz submission file {}".format(filename))
-        with open(filename, 'r', encoding="utf8") as f:
+        with open(filename, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             self.fieldnames = reader.fieldnames
             self.responses = [ QuizSubmission(row, **kwargs) for row in reader ]
