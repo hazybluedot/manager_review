@@ -2,8 +2,10 @@
 
 ## TLDR
 
-1. Download and install the latest stable release of Python 3 (on windows be sure to select the 64 bit installer)
-2. Download the zip archive of this repository by clicking the button on the right side of the page
+1. [Download](https://www.python.org/downloads/) and install the latest stable release of Python 3 (on windows be sure to select the 64 bit installer)
+2. [Download the zip archive](https://github.com/hazybluedot/manager_review/archive/master.zip)
+   of this repository by clicking the button on the right side of the
+   page
 3. Extract the downloaded archive, open the folder that was created and double click `manager_review_gui.py`
 
 ## Requirements
