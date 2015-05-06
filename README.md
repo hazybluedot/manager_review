@@ -11,6 +11,11 @@ option "Add python.exe to the search path" so that you don't need to
 specify the full path to the python executable when running it from
 the command line.
 
+#### Windows Users
+
+Things tend to go smoother if you are sure to install the 64bit
+version of Python.
+
 ### This program
 
 Download the zip archive by clicking the *Download ZIP* button to the
@@ -29,10 +34,13 @@ pull request. Note, this is not a full GUI implementation, the bulk of
 the program still runs from the command prompt, the GUI is just used
 to set the input and gradebook files.
 
-The GUI uses Tcl which you will have to install for your respective
-operating system before running `manager_review_gui.py`. I have tested
-the [ActiveTcl](http://www.activestate.com/activetcl) distribution of
-Tcl on Windows.
+The GUI uses Tcl, if you installed the 64bit version of Python on
+64bit windows you shouldn't have to install anything else to get this
+to work. In the event that you're on 32bit Windows, or you installed
+32bit Python you may have to install Tcl before
+`manager_review_gui.py` will work. The suggested distribution is
+[ActiveTcl](http://www.activestate.com/activetcl), it is free and does
+not require registration to download.
 
 ## Windows users
 
