@@ -20,11 +20,19 @@ prompt. (Windows users, open a command prompt, type `cd` followed by a
 space, and then drag and drop the folder name containing
 `manager_review.py` into the command window and press `Enter`)
 
-## Experimental GUI
+### Experimental GUI
 
 If you aren't feeling up for working from the command line try the
 experimental gui by running `manager_review_gui.py`. Yes, I know it
-looks really bad, if you want to make it pretty feel free to submit a pull request.
+looks really bad, if you want to make it pretty feel free to submit a
+pull request. Note, this is not a full GUI implementation, the bulk of
+the program still runs from the command prompt, the GUI is just used
+to set the input and gradebook files.
+
+The GUI uses Tcl which you will have to install for your respective
+operating system before running `manager_review_gui.py`. I have tested
+the [ActiveTcl](http://www.activestate.com/activetcl) distribution of
+Tcl on Windows.
 
 ## Windows users
 

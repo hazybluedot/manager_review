@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from sys import stdout, stderr
 from itertools import groupby
 import textwrap
 
@@ -127,22 +128,7 @@ def name_collector(result, fuzzy_filter):
     name = result.response(p,1).response.lower().strip()
     return fuzzy_filter(name).full_name
 
-    
-if __name__ == '__main__':
-    import sys
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input_file', help='input csv file exported from Scholar Tests&Quizes')
-    parser.add_argument('--interactive','-i', action='store_true', help='be interactive, ask for instructor contribution')
-    parser.add_argument('--gradebook', '-g', help='gradebook CSV (no structure, grades only)')
-    parser.add_argument('--name','-n', default="Manager's Review 2", help='gradebook item name')
-    parser.add_argument('--aliases', '-a', default='aliases.txt', help='location of aliases.txt for fuzzy name matching')
-    parser.add_argument('--comments', '-c', action='store_true', help='export comments to gradebook')
-    parser.add_argument('--submission-points', default=3, help='number of points just for submitting a manager review')
-    
-    args = parser.parse_args()
-
+def run(args):
     qs = tq.QuizSubmissions(args.input_file, response_filter=response_filter)
 
     reviews = [ ManagersReview(r.first_name, r.last_name, r.pid) for r in qs.latest ]
@@ -168,18 +154,18 @@ if __name__ == '__main__':
         review = [ review for review in reviews if review.full_name.lower().strip() == k ][0]
         review.add_reviews(g)
 
-        sys.stdout.write("{}\n".format(review.full_name))
+        print("{}".format(review.full_name))
         for label,score in review.scores.items():
-            sys.stdout.write("\t{}: {:0.1f}\n".format(label,score))
+            print("\t{}: {:0.1f}".format(label,score))
         for comment in review.peer_comments:
             try:
                 comment_lines = textwrap.wrap('"' + comment + '"',72)
             except AttributeError:
-                sys.stderr.write('AttributeError: {}, {}: attempt to wrap "{}"\n'.format(person.full_name, label, comment))
+                stderr.write('AttributeError: {}, {}: attempt to wrap "{}"\n'.format(person.full_name, label, comment))
             except TypeError:
-                sys.stderr.write('TypeError: {}, {}: attempt to wrap "{}"\n'.format(person.full_name, label, comment))
+                stderr.write('TypeError: {}, {}: attempt to wrap "{}"\n'.format(person.full_name, label, comment))
             else:
-                sys.stdout.writelines( [ '\t' + comment + '\n' for comment in comment_lines ])
+                stdout.writelines( [ '\t' + comment + '\n' for comment in comment_lines ])
         peer_subtotal = sum(review.scores.values())
         print("\tpeer subtotal: {:0.2f}".format(peer_subtotal))
         print("\tsubmission: {}".format(review.submission_points))
@@ -206,3 +192,20 @@ if __name__ == '__main__':
         else:
             gradebook.update_item(args.name, reviews)
             gradebook.write(args.gradebook)
+    
+if __name__ == '__main__':
+    import sys
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('input_file', help='input csv file exported from Scholar Tests&Quizes')
+    parser.add_argument('--interactive','-i', action='store_true', help='be interactive, ask for instructor contribution')
+    parser.add_argument('--gradebook', '-g', help='gradebook CSV (no structure, grades only)')
+    parser.add_argument('--name','-n', default="Manager's Review 2", help='gradebook item name')
+    parser.add_argument('--aliases', '-a', default='aliases.txt', help='location of aliases.txt for fuzzy name matching')
+    parser.add_argument('--comments', '-c', action='store_true', help='export comments to gradebook')
+    parser.add_argument('--submission-points', default=3, help='number of points just for submitting a manager review')
+    
+    args = parser.parse_args()
+
+    run(args)
