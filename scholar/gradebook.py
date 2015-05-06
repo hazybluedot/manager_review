@@ -1,12 +1,15 @@
 import csv
 import re
 
-from util import label_to_attr
+from util import label_to_attr, num_or_none
 
 base_headers = ['Student Id', 'Student Name', 'Section']
 tail_headers = ['Letter Grade', 'Total Points', 'Calculated Grade']
 gradebook_regex = re.compile(r'([^()]+) ((?:\([-0R]\)\s)+)?\[([0-9]+)\]$')
 gradebook_comment_regex = re.compile(r'Comment\s+:\s+([^()]+)$')
+
+def comment_key(item_name):
+    return "Comment : " + item_name
 
 class NoSuchItem(Exception):
     pass
@@ -21,6 +24,11 @@ class GradebookItem:
     def points(self):
         return "{:0.1f}".format(self._points + self.adjust)
     
+class GradebookScore:
+    def __init__(self, points, comments):
+        self.points = num_or_none(float,points)
+        self.comments = comments
+        
 class Person:
     def __init__(self, pid, name, section):
         self.student_id = pid
@@ -31,14 +39,19 @@ class Person:
         self.calculated_grade = ''
 
     @property
+    def pid(self):
+        return self.student_id
+    
+    @property
+    def full_name(self):
+        return self.student_name
+    
+    @property
     def name(self):
         return self.student_name
 
-#    @property
-#    def _dict(self):
-#        return { 'Student Id': self.pid,
-#                 'Student Name': self.name,
-#                 'Section': self.section }
+    def score_for(self, item_name):
+        return self.items[item_name]
     
     def __getitem__(self, key):
         value = getattr(self, key.lower().replace(' ','_'), None)
@@ -48,10 +61,10 @@ class Person:
         if m:
             key = m.group(1)
         if key in self.items:
-            return self.items[key][0]
+            return self.items[key].points
         m = gradebook_comment_regex.match(key)
         if m:
-            return self.items[m.group(1)][1]
+            return self.items[m.group(1)].comments
         raise KeyError(key)
     
 class GradebookItem:
@@ -112,7 +125,7 @@ def gradebook_items_from_fieldnames(fieldnames):
                 
 
 def items_from_row(row, items):
-    return { item.name: (row[item.label], row[item.comment_label]) for item in items }
+    return { item.name: GradebookScore(row[item.label], row[item.comment_label]) for item in items }
         
 def record_from_row(row, items):
     person = Person(row['Student Id'], row['Student Name'], row['Section'])
@@ -149,13 +162,16 @@ class Gradebook:
         record = [ record for record in self.records if getattr(record, attr_name, None) == rvalue ][0]
         return record
             
+    def records_for(self, item_name):
+        item = self.get_item(item_name)
+        records = [ record.items[item_name] for record in self.records ]
+        
     def update_item(self, item_name, scores):
         item = self.get_item(item_name)
         for s in scores:
             record = self.record_for('student_id', s.pid)
-            r = (s.points, s.comments)
+            r = GradebookScore(s.points, s.comments)
             record.items[item_name] = r
-
 
     @property
     def fieldnames(self):

@@ -26,7 +26,7 @@ class ManagersReview(Person):
         self.first_name = fname
         self.last_name = lname
         self.pid = pid
-        self.submission_points = 0
+        self.submission_points = 0.0
         self.comments = ""
         self.__instructor_points = 0
         self.labels = [ quality for quality in question_number_map.values() ]
@@ -71,13 +71,24 @@ class ManagersReview(Person):
             self.__instructor_points = float(val)
         except ValueError:
             pass
-        
+
+    @property
+    def peer_score(self):
+        return sum(self.scores.values())
+
     @property
     def points(self):
         """Return string representation of points for inclusion in gradebook"""
-        numpoints = sum(self.scores.values()) + self.instructor_points + self.submission_points
+        numpoints = self.peer_score + self.instructor_points + self.submission_points
         return "{:0.1f}".format(numpoints)
-    
+
+    @points.setter
+    def points(self, total_points):
+        total_points = float(total_points)
+        print("setting review points for {} to {}".format(self.full_name, total_points))
+        self.instructor_points = total_points - (self.peer_score + self.submission_points)
+        print("\tsetting instructor points to {} - ({} + {})".format(total_points, self.peer_score, self.submission_points))
+        
     def __repr__(self):
         representation = ""
         for label,score in self.scores.items():
@@ -128,6 +139,78 @@ def name_collector(result, fuzzy_filter):
     name = result.response(p,1).response.lower().strip()
     return fuzzy_filter(name).full_name
 
+def prompt_for_score(review):
+    instructor_score = 0
+    while instructor_score == 0:
+        instructor_prompt = 'Instructor score for {}'.format(review.full_name)
+        if review.instructor_points > 0:
+            instructor_prompt += ' ({:0.1f})'.format(review.instructor_points)
+        instructor_prompt += ':'
+                
+        instructor_input = input(instructor_prompt)
+
+        try:
+            instructor_score = float(instructor_input)
+        except ValueError:
+            stderr.write("'{}' is not a number\n".format(instructor_input))
+        return instructor_score
+
+def prompt_for_comments(review):
+    if args.comments:
+        if len(review.comments.strip()) > 0:
+            print('Current instructor comments: "{}"'.format(review.comments))
+        instructor_comments = input('Instructor comments for {}: '.format(review.full_name))
+        return instructor_comments
+    
+def collect_responses(responses, reviews, reviewee, gradebook):
+    for k, g in groupby(sorted(responses, key=reviewee), reviewee):
+        review = [ review for review in reviews if review.full_name.lower().strip() == k ][0]
+        review.add_reviews(g)
+
+        print("record for {}".format(review.pid))
+        record = [ record for record in gradebook.records if record.pid == review.pid][0]
+        score = record.score_for(args.name)
+        review.points = score.points
+        review.comments = score.comments
+        
+        print("{}".format(review.full_name))
+        for label,score in review.scores.items():
+            print("\t{}: {:0.1f}".format(label,score))
+        print("\t")
+        for comment in review.peer_comments:
+            try:
+                comment_lines = textwrap.wrap('"' + comment + '"',72)
+            except AttributeError:
+                stderr.write('AttributeError: {}, {}: attempt to wrap "{}"\n'.format(person.full_name, label, comment))
+            except TypeError:
+                stderr.write('TypeError: {}, {}: attempt to wrap "{}"\n'.format(person.full_name, label, comment))
+            else:
+                stdout.writelines( [ '\t' + comment + '\n' for comment in comment_lines ])
+        peer_subtotal = sum(review.scores.values())
+        print("\t")
+        print("\tpeer subtotal: {:0.2f}".format(peer_subtotal))
+        print("\tsubmission: {}".format(review.submission_points))
+        if args.interactive:
+            try:
+                instructor_score = prompt_for_score(review)
+            except (KeyboardInterrupt, EOFError):
+                print("")
+                return
+            else:
+                review.instructor_points = instructor_score
+
+            try:
+                instructor_comments = prompt_for_comments(review)
+            except (KeyboardInterrupt, EOFError):
+                print("")
+                return
+            else:
+                if len(instructor_comments) > 0:
+                    review.comments =  instructor_comments
+                
+        print("Total points for {}: {}".format(review.full_name, review.points))
+            #print("{}: {}".format(result.full_name, [ result.response(p,1).response for p in range(2,8) ]))
+
 def run(args):
     qs = tq.QuizSubmissions(args.input_file, response_filter=response_filter)
 
@@ -138,7 +221,13 @@ def run(args):
         review = [ review for review in reviews if review.full_name == submission.full_name ][0]
         review.submission_points = args.submission_points
 
-        
+    gradebook = None
+    if args.gradebook and args.name:
+        try:
+            gradebook = Gradebook(args.gradebook)
+        except FileNotFoundError as e:
+            stderr.write('No such file: {}\n'.format(args.gradebook))
+            
     name_corrector = Corrector( [ review.full_name.lower().strip() for review in reviews ], alias=args.aliases )
     find_people=people_finder(name_corrector)
 
@@ -150,40 +239,8 @@ def run(args):
     #    print(response)
     #sys.exit(0)
 
-    for k, g in groupby(sorted(responses, key=reviewee), reviewee):
-        review = [ review for review in reviews if review.full_name.lower().strip() == k ][0]
-        review.add_reviews(g)
-
-        print("{}".format(review.full_name))
-        for label,score in review.scores.items():
-            print("\t{}: {:0.1f}".format(label,score))
-        for comment in review.peer_comments:
-            try:
-                comment_lines = textwrap.wrap('"' + comment + '"',72)
-            except AttributeError:
-                stderr.write('AttributeError: {}, {}: attempt to wrap "{}"\n'.format(person.full_name, label, comment))
-            except TypeError:
-                stderr.write('TypeError: {}, {}: attempt to wrap "{}"\n'.format(person.full_name, label, comment))
-            else:
-                stdout.writelines( [ '\t' + comment + '\n' for comment in comment_lines ])
-        peer_subtotal = sum(review.scores.values())
-        print("\tpeer subtotal: {:0.2f}".format(peer_subtotal))
-        print("\tsubmission: {}".format(review.submission_points))
-        if args.interactive:
-            instructor_score = 0
-            while instructor_score == 0:
-                instructor_input = input('Instructor score for {}: '.format(review.full_name))
-                try:
-                    instructor_score = float(instructor_input)
-                except ValueError:
-                    stderr.write("'{}' is not a number\n".format(instructor_input))
-            review.instructor_points = instructor_score
-            if args.comments:
-                review.comments = input('Instructor comments for {}: '.format(review.full_name))
-                
-        print("Total points for {}: {}".format(review.full_name, review.points))
-            #print("{}: {}".format(result.full_name, [ result.response(p,1).response for p in range(2,8) ]))
-
+    collect_responses(responses, reviews, reviewee, gradebook)
+    
     if args.gradebook and args.name:
         try:
             gradebook = Gradebook(args.gradebook)

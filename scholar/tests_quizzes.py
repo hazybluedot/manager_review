@@ -76,6 +76,7 @@ particular part and question number"""
 class QuizSubmissions:
     def __init__(self, filename, **kwargs):
         self.rows = []
+        print("opening quiz submission file {}".format(filename))
         with open(filename, 'r') as f:
             reader = csv.DictReader(f)
             self.fieldnames = reader.fieldnames
