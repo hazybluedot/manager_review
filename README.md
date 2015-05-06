@@ -1,6 +1,13 @@
 # Manager's Review Processor
 
+## TLDR
+
+1. Download and install the latest stable release of Python 3 (on windows be sure to select the 64 bit installer)
+2. Download the zip archive of this repository by clicking the button on the right side of the page
+3. Extract the downloaded archive, open the folder that was created and double click `manager_review_gui.py`
+
 ## Requirements
+
 
 ### Python
 
@@ -42,32 +49,6 @@ to work. In the event that you're on 32bit Windows, or you installed
 [ActiveTcl](http://www.activestate.com/activetcl), it is free and does
 not require registration to download. If this all seems too complicated,
 blame Microsoft and then switch to a sensible operating system ;-)
-
-## Windows users
-
-If you added *python.exe* to the search path when installing Python
-you should be able to run the following command (`>` denotes the
-command prompt, don't type that):
-
-```
-> python.exe manager_review.py
-```
-
-If all is working you should see the help text for the program
-
-```
-usage: manager_review.py [-h] [--interactive] [--gradebook GRADEBOOK]
-                         [--name NAME] [--aliases ALIASES] [--comments]
-                         [--submission-points SUBMISSION_POINTS]
-                         input_file
-```
-
-If you did not add *python.exe* to the search path when you installed
-Python you will have to specify the full path to the python executable
-when running python programs for the command line. For the latest
-released of Python 3 this should be `C:\Python34\python.exe`. If the
-above command results in an error replace `python.exe` with the
-`C:\Python34\python.exe` and try again.
 
 ## Usage
 
@@ -133,3 +114,29 @@ Will display all available options.
 3. From the *Action* drop down to the left of the quiz for the manager review select "Scores"
 4. Once the scores page loads click the *Export* link and then the *Export* button
 5. Open the downloaded file in your spreadsheet program of choice and save as a CSV file.
+
+## Windows users
+
+If you added *python.exe* to the search path when installing Python
+you should be able to run the following command (`>` denotes the
+command prompt, don't type that):
+
+```
+> python.exe manager_review.py
+```
+
+If all is working you should see the help text for the program
+
+```
+usage: manager_review.py [-h] [--interactive] [--gradebook GRADEBOOK]
+                         [--name NAME] [--aliases ALIASES] [--comments]
+                         [--submission-points SUBMISSION_POINTS]
+                         input_file
+```
+
+If you did not add *python.exe* to the search path when you installed
+Python you will have to specify the full path to the python executable
+when running python programs for the command line. For the latest
+released of Python 3 this should be `C:\Python34\python.exe`. If the
+above command results in an error replace `python.exe` with the
+`C:\Python34\python.exe` and try again.
