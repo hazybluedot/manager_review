@@ -162,7 +162,7 @@ def prompt_for_comments(review):
         instructor_comments = input('Instructor comments for {}: '.format(review.full_name))
         return instructor_comments
     
-def collect_responses(responses, reviews, reviewee, gradebook):
+def collect_responses(responses, reviews, reviewee, gradebook, args):
     for k, g in groupby(sorted(responses, key=reviewee), reviewee):
         review = [ review for review in reviews if review.full_name.lower().strip() == k ][0]
         review.add_reviews(g)
@@ -239,7 +239,7 @@ def run(args):
     #    print(response)
     #sys.exit(0)
 
-    collect_responses(responses, reviews, reviewee, gradebook)
+    collect_responses(responses, reviews, reviewee, gradebook, args)
     
     if args.gradebook and args.name:
         try:
