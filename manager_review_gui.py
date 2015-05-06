@@ -66,7 +66,7 @@ class Application(Frame):
         self.gradebook_item_label = Label(self, text="Gradebook item name").grid(row=2, sticky=W)
         self.gradebook_itemname = Entry(self, textvariable=self.item_name).grid(row=2, column=1)
 
-        self.label_submission_points = Label(self, text="Gradebook item name").grid(row=3, sticky=W)
+        self.label_submission_points = Label(self, text="Points for submission").grid(row=3, sticky=W)
         self.entry_submission_points = Entry(self, textvariable=self.submission_points).grid(row=3, column=1)
 
         self.run = Button(self)
