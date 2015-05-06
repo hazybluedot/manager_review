@@ -3,6 +3,7 @@
 from sys import stdout, stderr
 from itertools import groupby
 import textwrap
+from os import name as os_name
 
 from corrector import Corrector
 from person import people_finder
@@ -141,6 +142,8 @@ def name_collector(result, fuzzy_filter):
 
 def prompt_for_score(review):
     instructor_score = 0
+    if os_name == 'nt':
+        print("Press Ctrl+C and then Enter to quit (changes will be saved)")
     while instructor_score == 0:
         instructor_prompt = 'Instructor score for {}'.format(review.full_name)
         if review.instructor_points > 0:
@@ -159,6 +162,8 @@ def prompt_for_score(review):
 
 def prompt_for_comments(review, args):
     if args.comments:
+        if os_name == 'nt':
+            print("Press Ctrl+C and then Enter to quit (changes will be saved)")
         if len(review.comments.strip()) > 0:
             print('Current instructor comments: "{}"'.format(review.comments))
         instructor_comments = input('Instructor comments for {}: '.format(review.full_name))
