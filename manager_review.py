@@ -192,7 +192,11 @@ def run(args):
         else:
             gradebook.update_item(args.name, reviews)
             gradebook.write(args.gradebook)
-    
+            stdout.write('Grades')
+            if args.comments:
+                stdout.write(' and comments')
+            stdout.write('written to {}, item {}\n'.fromat(args.gradebook, args.name))
+            
 if __name__ == '__main__':
     import sys
     import argparse
