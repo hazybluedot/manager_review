@@ -152,8 +152,10 @@ def prompt_for_score(review):
         try:
             instructor_score = float(instructor_input)
         except ValueError:
+            if len(instructor_score) == 0 and review.instructor_points > 0:
+                return review.instructor_points
             stderr.write("'{}' is not a number\n".format(instructor_input))
-        return instructor_score
+    return instructor_score
 
 def prompt_for_comments(review, args):
     if args.comments:
