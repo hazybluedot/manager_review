@@ -232,6 +232,10 @@ def run(args):
             gradebook = Gradebook(args.gradebook)
         except FileNotFoundError as e:
             stderr.write('No such file: {}\n'.format(args.gradebook))
+
+        if not gradebook.has_item(args.name):
+            stderr.write('{}: no such item in gradebook\n'.format(args.name))
+            return
             
     name_corrector = Corrector( [ review.full_name.lower().strip() for review in reviews ], alias=args.aliases )
     find_people=people_finder(name_corrector)

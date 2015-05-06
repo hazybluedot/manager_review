@@ -162,12 +162,14 @@ class Gradebook:
                 item = _item
                 
         if item is None:
-            print("items: {}".format(self.items.keys()))
             raise NoSuchItem(item)
         return item
 
     def has_item(self, item_name):
-        return self.get_item(item_name) is not None
+        try:
+            return self.get_item(item_name)
+        except NoSuchItem:
+            return None
     
     def record_for(self, attr_name, rvalue):
         record = [ record for record in self.records if getattr(record, attr_name, None) == rvalue ][0]
