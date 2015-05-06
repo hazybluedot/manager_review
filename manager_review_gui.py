@@ -14,6 +14,7 @@ class Arguments:
         self.input_file = None
         self.gradebook = None
         self.aliases='aliases.txt'
+        self.name = "Manager's Review 2"
         self.submission_points = 3
 
     @property
