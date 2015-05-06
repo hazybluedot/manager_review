@@ -65,21 +65,22 @@ class Application(Frame):
 
         self.gradebook_item_label = Label(self, text="Gradebook item name").grid(row=2, sticky=W)
         self.gradebook_itemname = Entry(self, textvariable=self.item_name).grid(row=2, column=1)
+        self.gradebook_item_message = Label(self, text="Must match the name of the item in your gradebook exactly").grid(row=3, columnspan=2)
 
-        self.label_submission_points = Label(self, text="Points for submission").grid(row=3, sticky=W)
-        self.entry_submission_points = Entry(self, textvariable=self.submission_points).grid(row=3, column=1)
+        self.label_submission_points = Label(self, text="Points for submission").grid(row=4, sticky=W)
+        self.entry_submission_points = Entry(self, textvariable=self.submission_points).grid(row=4, column=1)
 
         self.run = Button(self)
         self.run["text"] = "Go",
         self.run["command"] = self.run_with_args
-        self.run.grid(row=4,column=0)
+        self.run.grid(row=5,column=0)
 
         self.QUIT = Button(self)
         self.QUIT["text"] = "QUIT"
         self.QUIT["fg"]   = "red"
         self.QUIT["command"] =  self.quit
 
-        self.QUIT.grid(row=4, column=2)
+        self.QUIT.grid(row=5, column=2)
         
     def set_input_file(self):
         fname = askopenfilename(filetypes=(("CSV files", "*.csv"),
