@@ -125,7 +125,14 @@ def gradebook_items_from_fieldnames(fieldnames):
                 
 
 def items_from_row(row, items):
-    return { item.name: GradebookScore(row[item.label], row[item.comment_label]) for item in items }
+    def score(item):
+        return row[item.label]
+    def comment(item):
+        try:
+            return row[item.comment_label]
+        except KeyError:
+            return ""
+    return { item.name: GradebookScore(score(item), comment(item)) for item in items }
         
 def record_from_row(row, items):
     person = GradebookRow(row['Student Id'], row['Student Name'], row['Section'])
@@ -144,6 +151,7 @@ class Gradebook:
     def read(self, filename):
         with open(filename, 'r', encoding="utf8") as f:
             reader = csv.DictReader(f)
+            self.has_comments = any([ gradebook_comment_regex.match(fieldname) for fieldname in reader.fieldnames ])
             self.items = gradebook_items_from_fieldnames(reader.fieldnames)
             self.records = [ record_from_row(row, self.items) for row in reader ]
 
