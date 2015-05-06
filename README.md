@@ -40,7 +40,8 @@ to work. In the event that you're on 32bit Windows, or you installed
 32bit Python you may have to install Tcl before
 `manager_review_gui.py` will work. The suggested distribution is
 [ActiveTcl](http://www.activestate.com/activetcl), it is free and does
-not require registration to download.
+not require registration to download. If this all seems too complicated,
+blame Microsoft and then switch to a sensible operating system ;-)
 
 ## Windows users
 
@@ -71,6 +72,8 @@ above command results in an error replace `python.exe` with the
 ## Usage
 
 ### Start with GUI
+
+Double click the `manager_review_gui.py` file from your file browser.
 
 The experimental GUI provides a convenient way for users to initialize
 the program and set the desired assessment CSV file and gradebook CSV
