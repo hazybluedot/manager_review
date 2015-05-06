@@ -54,7 +54,7 @@ class GradebookRow:
         return self.items[item_name]
     
     def __getitem__(self, key):
-        value = getattr(self, key.lower().replace(' ','_'), None)
+        value = getattr(self, label_to_attr(key), None)
         if value is not None:
             return value
         m = gradebook_regex.match(key)
