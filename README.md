@@ -1,4 +1,4 @@
-# Managers Review Processor
+# Manager's Review Processor
 
 ## Requirements
 
