@@ -34,7 +34,6 @@ class Arguments:
 
     @input_file.setter
     def input_file(self, infile):
-        print("setting input file to {}".format(infile))
         self.__input_file = infile
         
     @property
@@ -43,7 +42,6 @@ class Arguments:
 
     @gradebook.setter
     def gradebook(self, infile):
-        print("setting gradebook file to {}".format(infile))
         self.__gradebook = infile
         
 class Application(Frame):
