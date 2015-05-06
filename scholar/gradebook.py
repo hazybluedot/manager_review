@@ -1,13 +1,12 @@
 import csv
 import re
-        
+
+from util import label_to_attr
+
 base_headers = ['Student Id', 'Student Name', 'Section']
 tail_headers = ['Letter Grade', 'Total Points', 'Calculated Grade']
 gradebook_regex = re.compile(r'([^()]+) ((?:\([-0R]\)\s)+)?\[([0-9]+)\]$')
 gradebook_comment_regex = re.compile(r'Comment\s+:\s+([^()]+)$')
-
-def label_to_attr(label):
-    return label.lower().replace(' ', '_')
 
 class NoSuchItem(Exception):
     pass

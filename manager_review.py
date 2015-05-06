@@ -1,32 +1,14 @@
 #!/usr/bin/env python3
 
-grade_scale = { 3: 5,
-               2: 4,
-               1: 2,
-               0: 0
-}
-
-points_for_submission = 5
-total_points = 50
-
-import csv
-import sys
-import re
-
 from itertools import groupby
-from operator import attrgetter, itemgetter
 import textwrap
-import argparse
 
 from corrector import Corrector
-from exceptions import UnknownPersonError, UniquePersonError
-from util import flatten_list, issumable
-from person import people_finder, Person, PersonReview
-from gradebook import Gradebook
-
-response_filter_regex = re.compile(r'Part [1-6], (Question [1-6]), Response')
-
-pivot_column = re.compile(r'Part [2-6], Question 1, Response')
+from person import people_finder
+from scholar import tests_quizzes as tq
+from scholar.gradebook import Gradebook
+from scholar.person import Person
+from util import flatten_list, label_to_attr, num_or_none
 
 question_number_map = { 2: 'Interdependence',
                         3: 'Team Planning',
@@ -35,132 +17,184 @@ question_number_map = { 2: 'Interdependence',
                         6: 'Comments'
                     }
 
-question_labels = { v: k for k,v in question_number_map.items() }
+review_attrs = [ label_to_attr(v) for v in question_number_map.values() ]
 
-def question_label_sort_key(key):
-    return question_labels[key]
-
-question_map = { re.compile(r'Question {}'.format(num)): label for num,label in question_number_map.items() }
-
-people = []
-
-def question_label(question):
-    for qregexp,label in question_map.items():
-        if qregexp.match(question):
-            return label
-    return None
-
-def filter_by_latest_submission(people):
-    """Return a list of unique people selecting by choosing each
-submission with max submission order"""
-    
-    result = [ max(g, key=attrgetter('submission_order'))
-               for k, g in groupby(people, lambda x: getattr(x, 'last_name') + getattr(x, 'first_name')) ]
-    return result
+class ManagersReview(Person):
+    """A manager's review for a single person"""
+    def __init__(self, fname, lname, pid):
+        self.first_name = fname
+        self.last_name = lname
+        self.pid = pid
+        self.submission_points = 0
+        self.__instructor_points = 0
+        self.labels = [ quality for quality in question_number_map.values() ]
+        for quality in self.labels:
+            setattr(self, label_to_attr(quality), [])
             
-def split_responses(row, pivot_column, fieldnames):
-    """Take a single row containing a person's response, pivot on
-pivot_column adding each pivoted entry as a response this person made"""
-    
-    person = Person(row['Last Name'], row['First Name'], row['User Name'])
-    person.section = row['Part 1, Question 1, Response']
-    person.group_num = int(row['Part 1, Question 2, Response'])
-    person.submission_order = int(row['Order of Submission (1=first)'])
-    
-    current_name = None
-    for key in fieldnames:
-        if pivot_column.match(key):
-            current_name = row[key][3:] # values have a '1: ' prefix, what remains after this is the name
-            person.responses[current_name] = PersonReview(current_name, response_filter=response_filter_regex)
-        elif current_name is not None:
-            person.responses[current_name].add_response(key, row[key])
+    def add_reviews(self, reviews):
+        for r in reviews:
+            self.add_review(r)
 
-    return person
+    def add_review(self, review):
+        for rr in review.reviews:
+            label = label_to_attr(question_number_map[rr[0]])
+            attr = getattr(self, label)
+            attr.append(rr[1])
+            setattr(self, label, attr)
 
+    def __getitem__(self, label):
+        return getattr(self, label_to_attr(label))
+
+    @property
+    def scores(self):
+        return { label: self.score_for(label) for label in self.labels if not label == 'Comments' }
+
+    def score_for(self, label):
+        scores = [ score for score in self.__getitem__(label) if score is not None ]
+        try:
+            return sum(scores)/len(scores)
+        except ZeroDivisionError:
+            return 0
+
+    @property
+    def instructor_points(self):
+        return self.__instructor_points
+
+    @instructor_points.setter
+    def instructor_points(self, val):
+        try:
+            self.__instructor_points = float(val)
+        except ValueError:
+            pass
+        
+    @property
+    def points(self):
+        return sum(self.scores.values()) + self.instructor_points + self.submission_points
+    
+    def __repr__(self):
+        representation = ""
+        for label,score in self.scores.items():
+            representation += "{}: {}\n".format(label, score)
+        return representation
+    
+class ManagersReviewResponse():
+    
+    def __init__(self, responses):
+        self.full_name = [ response.result for response in responses if response.question == 1 ][0]
+        #super().__init__(fname, lname, pid)
+        self.reviews = [ (response.question,response.result) for response in responses if response.question > 1 ]
+        
+    def __repr__(self):
+        return "{} has {} questions".format(self.full_name, len(self.reviews))
+    
+class ManagersReviewSubmission(Person):
+    def __init__(self, submission):
+        super().__init__(submission.first_name, submission.last_name, submission.pid)
+        self.submission = submission
+        self.reviews = [ ManagersReviewResponse(self.submission.responses(p)) for p in range(2,8) ]
+        self.submitted = num_or_none(int, submission.submission_order) is not None
+        
+    def review_for(self, name):
+        try:
+            return [ review for review in self.reviews if review.full_name == name ][0]
+        except IndexError:
+            return None
+
+    def __repr__(self):
+        return "<ManagersReviewSubmission ({}) {} reviews>".format(super().__repr__(), len(self.reviews))
+    
+def int_or_none(val):
+    try:
+        return int(val)
+    except ValueError:
+        return None
+    
+def response_filter(q):
+    if q[0] > 1 and q[1] == 1:
+        return lambda s: s[3:]
+    elif q[0] > 1 and q[1] > 1 and q[1] < 6:
+        return int_or_none
+    else:
+        return lambda s: s
+
+def name_collector(result, fuzzy_filter):
+    name = result.response(p,1).response.lower().strip()
+    return fuzzy_filter(name).full_name
+
+    
 if __name__ == '__main__':
+    import sys
+    import argparse
+
     parser = argparse.ArgumentParser()
     parser.add_argument('input_file', help='input csv file exported from Scholar Tests&Quizes')
     parser.add_argument('--interactive','-i', action='store_true', help='be interactive, ask for instructor contribution')
     parser.add_argument('--gradebook', '-g', help='gradebook CSV (no structure, grades only)')
-    parser.add_argument('--name','-n', default="Manager's Review", help='gradebook item name')
+    parser.add_argument('--name','-n', default="Manager's Review 2", help='gradebook item name')
     parser.add_argument('--output', '-o', default=sys.stdout, help='output file')
+    parser.add_argument('--alias', '-a', default='aliases.txt', help='location of aliases.txt for fuzzy name matching')
     parser.add_argument('--comments', '-c', action='store_true', help='export comments to gradebook')
+    parser.add_argument('--submission-points', default=3, help='number of points just for submitting a manager review')
+    
     args = parser.parse_args()
 
-    people = None    
-    with open(args.input_file, 'r') as csvfile:
-        reader = csv.DictReader(csvfile)
-        people = filter_by_latest_submission([ split_responses(row, pivot_column, reader.fieldnames) for num,row in enumerate(reader) ])
+    qs = tq.QuizSubmissions(args.input_file, response_filter=response_filter)
+
+    reviews = [ ManagersReview(r.first_name, r.last_name, r.pid) for r in qs.latest ]
+    submissions = [ ManagersReviewSubmission(result) for result in qs.latest if num_or_none(int,result.submission_order) is not None ]
+
+    for submission in submissions:
+        review = [ review for review in reviews if review.full_name == submission.full_name ][0]
+        review.submission_points = args.submission_points
+
         
-    # fuzzy name corrector to ease handling of misspelled names
-    name_corrector = Corrector( [ person.full_name.lower().strip() for person in people ] )
-    try:
-        name_corrector.load_aliases('aliases.txt')
-    except FileNotFoundError:
-        pass
-    find_person = people_finder(name_corrector)
+    name_corrector = Corrector( [ review.full_name.lower().strip() for review in reviews ], alias=args.alias )
+    find_people=people_finder(name_corrector)
 
-    # collect reviews
-    reviews = flatten_list([ person.responses.values() for person in people ])    
-    for review in reviews:
-        try:
-            person = find_person(people, review.name)
-            person.add_review(review)
-        except UnknownPersonError as e:
-            sys.stderr.write(str(e) + '\n')
-        except UniquePersonError as e:
-            sys.stderr.write(str(e) + '\n')
+    def reviewee(review):
+        #return review.full_name
+        return find_people([r for r in reviews], review.full_name).full_name.lower().strip()
+    responses = flatten_list([ submission.reviews for submission in submissions ])
+    #for response in sorted(responses, key=reviewee):
+    #    print(response)
+    #sys.exit(0)
 
-    name_corrector.save_aliases('aliases.txt')
-                         
-    for person in people:
-        person.grade_scale = grade_scale
-        scores = { question_label(question): score for question,score in person.scores.items() }
-        sys.stdout.write('{}:\n'.format(person.full_name))
-        responses = { question_label(question): review for question,review in person.reviews.items() if question_label(question) }
+    for k, g in groupby(sorted(responses, key=reviewee), reviewee):
+        review = [ review for review in reviews if review.full_name.lower().strip() == k ][0]
+        review.add_reviews(g)
 
-        subtotal = sum(scores.values()) + points_for_submission
-        for label in sorted(responses, key=question_label_sort_key):
-            review = responses[label]
-            score = None
-            if not label == 'Comments':
-                score = scores[label]
-
-            if score is not None:
-                sys.stdout.write('\t{}: {:0.2} ({})\n'.format(label, score, review))
-            elif label == 'Comments':
-                for comment in review:
-                    try:
-                        comment_lines = textwrap.wrap('"' + comment + '"',72)
-                    except AttributeError:
-                        sys.stderr.write('AttributeError: {}, {}: attempt to wrap "{}"\n'.format(person.full_name, label, comment))
-                    except TypeError:
-                        sys.stderr.write('TypeError: {}, {}: attempt to wrap "{}"\n'.format(person.full_name, label, comment))
-                    else:
-                        sys.stdout.writelines( [ '\t' + comment + '\n' for comment in comment_lines ])
-                if args.comments:
-                    person.comments = "\n".join(review)
-
-        sys.stdout.write('\tsubtotal: {:0.3} ({:0.3} left)\n'.format(subtotal, total_points-subtotal))
-        sys.stdout.write('\n')
+        sys.stdout.write("{}\n".format(review.full_name))
+        for label,score in review.scores.items():
+            sys.stdout.write("\t{}: {:0.1f}\n".format(label,score))
+        for comment in review.comments:
+            try:
+                comment_lines = textwrap.wrap('"' + comment + '"',72)
+            except AttributeError:
+                sys.stderr.write('AttributeError: {}, {}: attempt to wrap "{}"\n'.format(person.full_name, label, comment))
+            except TypeError:
+                sys.stderr.write('TypeError: {}, {}: attempt to wrap "{}"\n'.format(person.full_name, label, comment))
+            else:
+                sys.stdout.writelines( [ '\t' + comment + '\n' for comment in comment_lines ])
+        peer_subtotal = sum(review.scores.values())
+        print("\tpeer subtotal: {:0.2f}".format(peer_subtotal))
+        print("\tsubmission: {}".format(review.submission_points))
         if args.interactive:
             instructor_score = 0
             while instructor_score == 0:
-                instructor_input = input('Instructor score: ')
+                instructor_input = input('Instructor score for {}: '.format(review.full_name))
                 try:
                     instructor_score = float(instructor_input)
                 except ValueError:
                     sys.stderr.write("'{}' is not a number\n".format(instructor_input))
+            review.instructor_points = instructor_score
+        print("Total points for {}: {:0.2f}".format(review.full_name, review.points))
+            #print("{}: {}".format(result.full_name, [ result.response(p,1).response for p in range(2,8) ]))
 
-            person.total_score = subtotal+instructor_score
-        else:
-            person.total_score = subtotal + 25
-        
     if args.gradebook and args.name:
         try:
             gradebook = Gradebook(args.gradebook)
         except FileNotFoundError as e:
             sys.stderr.write('No such file: {}\n'.format(args.gradebook))
         else:
-            gradebook.update_item(args.name, people)
+            gradebook.update_item(args.name, reviews)
             gradebook.write(args.gradebook)

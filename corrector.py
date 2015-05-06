@@ -13,12 +13,17 @@ def edits1(word):
     return set(deletes + transposes + replaces + inserts)
 
 class Corrector:
-    def __init__(self, training_words):
-       self.model = collections.defaultdict(lambda: 1)
-       self.aliases = {}
-       for f in training_words:
-           self.model[f] += 1
-
+    def __init__(self, training_words, **kwargs):
+        self.model = collections.defaultdict(lambda: 1)
+        self.aliases = {}
+        for f in training_words:
+            self.model[f] += 1
+        self.alias_file = kwargs.pop('alias', None)
+        try:
+            self.load_aliases(self.alias_file)
+        except FileNotFoundError:
+            pass
+            
     def known_edits2(self, word):
         return set(e2 for e1 in edits1(word) for e2 in edits1(e1) if e2 in self.model)
 
@@ -27,6 +32,8 @@ class Corrector:
 
     def add_alias(self, alias, real):
         self.aliases[alias] = real
+        if self.alias_file is not None:
+            self.save_aliases(self.alias_file)
        
     def correct(self, word, aliases=None):
         if word in self.aliases:
