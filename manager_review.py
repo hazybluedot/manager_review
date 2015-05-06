@@ -162,8 +162,6 @@ def prompt_for_score(review):
 
 def prompt_for_comments(review, args):
     if args.comments:
-        if os_name == 'nt':
-            print("Press Ctrl+C and then Enter to quit (changes will be saved)")
         if len(review.comments.strip()) > 0:
             print('Current instructor comments: "{}"'.format(review.comments))
         instructor_comments = input('Instructor comments for {}: '.format(review.full_name))
