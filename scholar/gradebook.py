@@ -142,7 +142,7 @@ class Gradebook:
         self.read(csvfile)
     
     def read(self, filename):
-        with open(filename, 'r') as f:
+        with open(filename, 'r', encoding="utf8") as f:
             reader = csv.DictReader(f)
             self.items = gradebook_items_from_fieldnames(reader.fieldnames)
             self.records = [ record_from_row(row, self.items) for row in reader ]
@@ -158,6 +158,9 @@ class Gradebook:
             raise NoSuchItem(item)
         return item
 
+    def has_item(self, item_name):
+        return self.get_item(item_name) is not None
+    
     def record_for(self, attr_name, rvalue):
         record = [ record for record in self.records if getattr(record, attr_name, None) == rvalue ][0]
         return record
