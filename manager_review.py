@@ -26,24 +26,28 @@ class ManagersReview(Person):
         self.last_name = lname
         self.pid = pid
         self.submission_points = 0
+        self.comments = ""
         self.__instructor_points = 0
         self.labels = [ quality for quality in question_number_map.values() ]
         for quality in self.labels:
-            setattr(self, label_to_attr(quality), [])
+            setattr(self, '_' + label_to_attr(quality), [])
             
     def add_reviews(self, reviews):
         for r in reviews:
             self.add_review(r)
-
+    @property
+    def peer_comments(self):
+        return self._comments
+    
     def add_review(self, review):
         for rr in review.reviews:
-            label = label_to_attr(question_number_map[rr[0]])
+            label = '_' + label_to_attr(question_number_map[rr[0]])
             attr = getattr(self, label)
             attr.append(rr[1])
             setattr(self, label, attr)
 
     def __getitem__(self, label):
-        return getattr(self, label_to_attr(label))
+        return getattr(self, '_' + label_to_attr(label))
 
     @property
     def scores(self):
@@ -69,7 +73,9 @@ class ManagersReview(Person):
         
     @property
     def points(self):
-        return sum(self.scores.values()) + self.instructor_points + self.submission_points
+        """Return string representation of points for inclusion in gradebook"""
+        numpoints = sum(self.scores.values()) + self.instructor_points + self.submission_points
+        return "{:0.1f}".format(numpoints)
     
     def __repr__(self):
         representation = ""
@@ -131,8 +137,7 @@ if __name__ == '__main__':
     parser.add_argument('--interactive','-i', action='store_true', help='be interactive, ask for instructor contribution')
     parser.add_argument('--gradebook', '-g', help='gradebook CSV (no structure, grades only)')
     parser.add_argument('--name','-n', default="Manager's Review 2", help='gradebook item name')
-    parser.add_argument('--output', '-o', default=sys.stdout, help='output file')
-    parser.add_argument('--alias', '-a', default='aliases.txt', help='location of aliases.txt for fuzzy name matching')
+    parser.add_argument('--aliases', '-a', default='aliases.txt', help='location of aliases.txt for fuzzy name matching')
     parser.add_argument('--comments', '-c', action='store_true', help='export comments to gradebook')
     parser.add_argument('--submission-points', default=3, help='number of points just for submitting a manager review')
     
@@ -148,7 +153,7 @@ if __name__ == '__main__':
         review.submission_points = args.submission_points
 
         
-    name_corrector = Corrector( [ review.full_name.lower().strip() for review in reviews ], alias=args.alias )
+    name_corrector = Corrector( [ review.full_name.lower().strip() for review in reviews ], alias=args.aliases )
     find_people=people_finder(name_corrector)
 
     def reviewee(review):
@@ -166,7 +171,7 @@ if __name__ == '__main__':
         sys.stdout.write("{}\n".format(review.full_name))
         for label,score in review.scores.items():
             sys.stdout.write("\t{}: {:0.1f}\n".format(label,score))
-        for comment in review.comments:
+        for comment in review.peer_comments:
             try:
                 comment_lines = textwrap.wrap('"' + comment + '"',72)
             except AttributeError:
@@ -187,7 +192,10 @@ if __name__ == '__main__':
                 except ValueError:
                     sys.stderr.write("'{}' is not a number\n".format(instructor_input))
             review.instructor_points = instructor_score
-        print("Total points for {}: {:0.2f}".format(review.full_name, review.points))
+            if args.comments:
+                review.comments = input('Instructor comments for {}: '.format(review.full_name))
+                
+        print("Total points for {}: {}".format(review.full_name, review.points))
             #print("{}: {}".format(result.full_name, [ result.response(p,1).response for p in range(2,8) ]))
 
     if args.gradebook and args.name:
