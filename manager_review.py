@@ -23,10 +23,16 @@ review_attrs = [ label_to_attr(v) for v in question_number_map.values() ]
 
 class ManagersReview(Person):
     """A manager's review for a single person"""
-    def __init__(self, fname, lname, pid):
+    def __init__(self, fname, lname, pid, **kwargs):
         self.first_name = fname
         self.last_name = lname
         self.pid = pid
+        self.section = None
+        self.group = None
+        response = kwargs.pop('response', None)
+        if response is not None:
+            self.section = response.responses(1,1).result
+            self.group = response.responses(1,2).result
         self.submission_points = 0.0
         self.comments = ""
         self.__instructor_points = 0
@@ -42,6 +48,10 @@ class ManagersReview(Person):
         return self._comments
     
     def add_review(self, review):
+        if review.section is not None:
+            self.section = review.section
+        if review.group is not None:
+            self.group = review.group    
         for rr in review.reviews:
             label = '_' + label_to_attr(question_number_map[rr[0]])
             attr = getattr(self, label)
@@ -96,8 +106,10 @@ class ManagersReview(Person):
     
 class ManagersReviewResponse():
     
-    def __init__(self, responses):
+    def __init__(self, responses, section, group):
         self.full_name = [ response.result for response in responses if response.question == 1 ][0]
+        self.section = section
+        self.group = group
         #super().__init__(fname, lname, pid)
         self.reviews = [ (response.question,response.result) for response in responses if response.question > 1 ]
         
@@ -110,7 +122,9 @@ class ManagersReviewSubmission(Person):
             return len(self.submission.responses(p,1).response.strip()) > 0
         super().__init__(submission.first_name, submission.last_name, submission.pid)
         self.submission = submission
-        self.reviews = [ ManagersReviewResponse(self.submission.responses(p)) for p in range(2,8) if has_name(p) ]
+        self.section = self.submission.responses(1,1).result
+        self.group = self.submission.responses(1,2).result
+        self.reviews = [ ManagersReviewResponse(self.submission.responses(p), self.section, self.group) for p in range(2,8) if has_name(p) ]
         self.submitted = num_or_none(int, submission.submission_order) is not None
         
     def review_for(self, name):
@@ -172,6 +186,10 @@ def collect_responses(responses, reviews, reviewee, gradebook, args):
         review = [ review for review in reviews if review.full_name.lower().strip() == k ][0]
         review.add_reviews(g)
 
+    def section_team_name(review):
+        return review.section + review.group + review.full_name
+    
+    for review in sorted(reviews, key=section_team_name):
         print("record for {}".format(review.pid))
         record = [ record for record in gradebook.records if record.pid == review.pid][0]
         score = record.score_for(args.name)
@@ -182,7 +200,7 @@ def collect_responses(responses, reviews, reviewee, gradebook, args):
         
         review.comments = score.comments
         
-        print("{}".format(review.full_name))
+        print("{} ({}, Team {})".format(review.full_name, review.section, review.group))
         for label,score in review.scores.items():
             print("\t{}: {:0.1f}".format(label,score))
         print("\t")
@@ -226,7 +244,7 @@ def run(args):
                             encoding=args.input_file_encoding,
                             delimiter=args.input_file_delimiter)
 
-    reviews = [ ManagersReview(r.first_name, r.last_name, r.pid) for r in qs.latest ]
+    reviews = [ ManagersReview(r.first_name, r.last_name, r.pid, response=r) for r in qs.latest ]
     submissions = [ ManagersReviewSubmission(result) for result in qs.latest if num_or_none(int,result.submission_order) is not None ]
 
     for submission in submissions:
@@ -250,6 +268,7 @@ def run(args):
     def reviewee(review):
         #return review.full_name
         return find_people([r for r in reviews], review.full_name).full_name.lower().strip()
+
     responses = flatten_list([ submission.reviews for submission in submissions ])
     #for response in sorted(responses, key=reviewee):
     #    print(response)
@@ -282,6 +301,10 @@ if __name__ == '__main__':
     parser.add_argument('--aliases', '-a', default='aliases.txt', help='location of aliases.txt for fuzzy name matching')
     parser.add_argument('--comments', '-c', action='store_true', help='export comments to gradebook')
     parser.add_argument('--submission-points', default=3, help='number of points just for submitting a manager review')
+    parser.add_argument('--input_file_encoding', default='utf-8', help='encoding of tests&quizzes file')
+    parser.add_argument('--input_file_delimiter', default=',', help='delimiting character of tests&quizzes file')
+    parser.add_argument('--gradebook_encoding', default='utf=8', help='encoding of gradebook file')
+    parser.add_argument('--gradebook_delimiter', default=',', help='delimiting character of gradebook file')
     
     args = parser.parse_args()
 
