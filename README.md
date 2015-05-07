@@ -89,17 +89,17 @@ blame Microsoft and then switch to a sensible operating system ;-)
 Double click the `manager_review_gui.py` file from your file browser.
 
 The experimental GUI provides a convenient way for users to initialize
-the program and set the desired assessment CSV file and gradebook CSV
-file. After that and pressing *Go* the GUI invokes the command line
-program with the input and gradebook files set as well as the `-i` and
-`-c` options. Once you have entered the final score and comment the
-command line program will exit and grades and comments will be saved
-to the gradebook file you selected. Import that file into Scholar
-gradebook.
+the program and set the desired assessment *Unicode Text* file and
+gradebook CSV file. After that and pressing *Go* the GUI invokes the
+command line program with the input and gradebook files set as well as
+the `-i` and `-c` options. Once you have entered the final score and
+comment the command line program will exit and grades and comments
+will be saved to the gradebook file you selected. Import that file
+into Scholar gradebook.
 
 ### Start from the command line
 
-In the following example `assessment.csv` is the csv exported
+In the following example `assessment.txt` is the Unicode text exported
 assesment data downloaded from Scholar Tests&Quizes and
 `gradebook.csv` is the exported gradebook with no structure, just
 grades. See the
@@ -107,18 +107,18 @@ grades. See the
 for instructions.
 
 ```
-> python manager_review.py -i -g gradebook.csv Assessment-Project#2_Team_Eval.csv
+> python manager_review.py -i -g gradebook.csv assessment.txt
 ```
 
 To record and include comments
 
 ```
-> python manager_review.py -ic -g gradebook.csv Assessment-Project#2_Team_Eval.csv
+> python manager_review.py -ic -g gradebook.csv assessment.txt
 ```
 
 If reviewers made typos or spelling errors when entering reviewee names
-you will be prompted for a name correction.  These correctons will be
-saved in a file called `alieases.txt` in the current directory, you
+you will be prompted for a name correction.  These corrections will be
+saved in a file called `aliases.txt` in the current directory, you
 can specify an alternate file using the `--aliases` command option.
 
 ```
@@ -126,6 +126,10 @@ can specify an alternate file using the `--aliases` command option.
 usage: manager_review.py [-h] [--interactive] [--gradebook GRADEBOOK]
                          [--name NAME] [--aliases ALIASES] [--comments]
                          [--submission-points SUBMISSION_POINTS]
+                         [--input_file_encoding INPUT_FILE_ENCODING]
+                         [--input_file_delimiter INPUT_FILE_DELIMITER]
+                         [--gradebook_encoding GRADEBOOK_ENCODING]
+                         [--gradebook_delimiter GRADEBOOK_DELIMITER]
                          input_file
 ```
 
