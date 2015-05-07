@@ -120,7 +120,7 @@ class ManagersReviewSubmission(Person):
     def __init__(self, submission):
         def has_name(p):
             name = self.submission.responses(p,1).response.strip()
-            return len(name) > 0 and not name == 'No Answer' # Scholar is stupid
+            return len(name) > 0 and not name == 'No Answer' and not name == 'Answer' # Scholar is stupid
         super().__init__(submission.first_name, submission.last_name, submission.pid)
         self.submission = submission
         self.section = self.submission.responses(1,1).result
