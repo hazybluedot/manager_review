@@ -16,9 +16,11 @@
    window. During data entry you may press `Ctrl+C` and then `Enter`
    to cancel and save any changes so far.
    1. If the program can't match a reveiwee's name to one in the gradebook (i.e. a reviewer used a nick name or made a typo) you will see a prompt like
+
        ````
        Who is Joe Smith?
        ````
+
        Simply type in the full name, first then last, of the person and press `Enter` to continue. Once all ambiguous names have been resolved the review process will start.
 
 ## Requirements
