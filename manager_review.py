@@ -106,9 +106,11 @@ class ManagersReviewResponse():
     
 class ManagersReviewSubmission(Person):
     def __init__(self, submission):
+        def has_name(p):
+            return len(self.submission.responses(p,1).response.strip()) > 0
         super().__init__(submission.first_name, submission.last_name, submission.pid)
         self.submission = submission
-        self.reviews = [ ManagersReviewResponse(self.submission.responses(p)) for p in range(2,8) ]
+        self.reviews = [ ManagersReviewResponse(self.submission.responses(p)) for p in range(2,8) if has_name(p) ]
         self.submitted = num_or_none(int, submission.submission_order) is not None
         
     def review_for(self, name):

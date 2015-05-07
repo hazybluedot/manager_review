@@ -145,12 +145,14 @@ def object_to_dict(obj, fieldnames):
     return { key: obj[key] for key in fieldnames }
 
 class Gradebook:    
-    def __init__(self, csvfile):
-        self.read(csvfile)
-    
-    def read(self, filename):
-        with open(filename, 'r', encoding='utf8') as f:
-            reader = csv.DictReader(f)
+    def __init__(self, csvfile, **kwargs):
+        self.encoding = kwargs.pop('encoding', 'utf8')
+        self.delimiter = kwargs.pop('delimiter', ',')
+        self.read(csvfile, **kwargs)
+
+    def read(self, filename, **kwargs):
+        with open(filename, 'r', encoding=self.encoding) as f:
+            reader = csv.DictReader(f, delimiter=self.delimiter)
             #self.has_comments = any([ gradebook_comment_regex.match(fieldname) for fieldname in reader.fieldnames ])
             self.items = gradebook_items_from_fieldnames(reader.fieldnames)
             self.records = [ record_from_row(row, self.items) for row in reader ]
@@ -196,8 +198,8 @@ class Gradebook:
         return fields
     
     def write(self, filename):
-        with open(filename, 'w', newline='', encoding='utf8') as f:
-            writer = csv.DictWriter(f, fieldnames=self.fieldnames)
+        with open(filename, 'w', newline='', encoding=self.encoding) as f:
+            writer = csv.DictWriter(f, fieldnames=self.fieldnames, delimiter=self.delimiter)
             writer.writeheader()
             for record in self.records:
                 writer.writerow(object_to_dict(record, self.fieldnames))
