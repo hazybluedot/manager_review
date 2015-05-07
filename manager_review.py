@@ -221,7 +221,10 @@ def collect_responses(responses, reviews, reviewee, gradebook, args):
             #print("{}: {}".format(result.full_name, [ result.response(p,1).response for p in range(2,8) ]))
 
 def run(args):
-    qs = tq.QuizSubmissions(args.input_file, response_filter=response_filter)
+    qs = tq.QuizSubmissions(args.input_file,
+                            response_filter=response_filter,
+                            encoding=args.input_file_encoding,
+                            delimiter=args.input_file_delimiter)
 
     reviews = [ ManagersReview(r.first_name, r.last_name, r.pid) for r in qs.latest ]
     submissions = [ ManagersReviewSubmission(result) for result in qs.latest if num_or_none(int,result.submission_order) is not None ]
@@ -233,7 +236,7 @@ def run(args):
     gradebook = None
     if args.gradebook and args.name:
         try:
-            gradebook = Gradebook(args.gradebook)
+            gradebook = Gradebook(args.gradebook, encoding=args.gradebook_encoding, delimiter=args.gradebook_delimiter)
         except FileNotFoundError as e:
             stderr.write('No such file: {}\n'.format(args.gradebook))
 
