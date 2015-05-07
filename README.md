@@ -18,7 +18,7 @@
 1. For the input file click 'Browse' and select "\*.txt" as the file
    type and select the Unicode Text file you saved containing the
    manager review responses. On the GUI screen change the encoding
-   type to *UTF-16* and the delimiter to *<tab>*.
+   type to *UTF-16* and the delimiter to *\<tab>*.
 1. For the gradebook file click 'Browse' and select the CSV file containing your gradebook export
 1. All subsequent input will be done through the command
    window. During data entry you may press `Ctrl+C` and then `Enter`
