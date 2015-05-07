@@ -3,7 +3,8 @@
 ## TLDR
 
 1. [Export files from Scholar](#exporting-data-from-scholar)
-    1. Export your manager's review scores, then save as CSV
+    1. Export your manager's review scores, then save as *Unicode
+       Text*
     1. Under gradebook be sure to create a grade item for the
        *Manager's Review 2*, if you haven't already. Make a not of the
        exact name you give this item, you will need to input it later.
@@ -14,7 +15,10 @@
    of this repository by clicking the button on the right side of the
    page
 1. Extract the downloaded archive, open the folder that was created and double click `manager_review_gui.py`
-1. For the input file click 'Browse' and select the CSV file containing your manager's review scores
+1. For the input file click 'Browse' and select "\*.txt" as the file
+   type and select the Unicode Text file you saved containing the
+   manager review responses. On the GUI screen change the encoding
+   type to *UTF-16* and the delimiter to *<tab>*.
 1. For the gradebook file click 'Browse' and select the CSV file containing your gradebook export
 1. All subsequent input will be done through the command
    window. During data entry you may press `Ctrl+C` and then `Enter`
@@ -233,4 +237,8 @@ into Gradebook under the item you created for this assignment.
 2. Select *Published Copies*
 3. From the *Action* drop down to the left of the quiz for the manager review select "Scores"
 4. Once the scores page loads click the *Export* link and then the *Export* button
-5. Open the downloaded file in your spreadsheet program of choice and save as a CSV file.
+5. Open the downloaded file in your spreadsheet program of choice and
+   save to a Unicode CSV format. If using Excel select *Unicode Text*
+   from the *Save as type* option. In its infinite wisdom, Microsoft
+   decided that when exporting to CSV the only encoding option is
+   ASCII.
