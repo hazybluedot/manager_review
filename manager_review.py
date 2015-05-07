@@ -267,7 +267,7 @@ def run(args):
 
     def reviewee(review):
         #return review.full_name
-        return find_people([r for r in reviews], review.full_name).full_name.lower().strip()
+        return find_people([r for r in reviews], review.full_name, review=review).full_name.lower().strip()
 
     responses = flatten_list([ submission.reviews for submission in submissions ])
     #for response in sorted(responses, key=reviewee):
