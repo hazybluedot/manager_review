@@ -4,6 +4,9 @@
 
 1. [Export files from Scholar](#exporting-data-from-scholar)
     1. Export your manager's review scores, then save as CSV
+    1. Under gradebook be sure to create a grade item for the
+       *Manager's Review 2*, if you haven't already. Make a not of the
+       exact name you give this item, you will need to input it later.
     1. Export your gradebook, select "No-structure (grades only)" and "CSV"
         1. If you are on the common site, select only your section to export
 1. [Download](https://www.python.org/downloads/) and install the latest stable release of Python 3 (on windows be sure to select the 64 bit installer)
@@ -112,6 +115,94 @@ can specify an alternate file using the `--aliases` command option.
 
 Will display all available options.
 
+### Name Association
+
+The first thing you are likely to see once the program is invoked via
+either the command line or GUI is the name association prompt. This
+appears when there are names entered by students that do not match
+names in the gradebook. This could be due to spelling errors or
+nicknames.
+
+````
+In section 2:00 Tu/Th, Team 1 who is "Joe Smith"?
+````
+
+Determine the full name of the student referenced and type it at the prompt and press `Enter`
+
+````
+In section 2:00 Tu/Th, Team 1 who is "Joe Smith"? Joseph Smith
+In section 12:30 Tu/Th, Team 5 who is "Sue Lee"?
+````
+
+If the name you enter isn't found in gradebook the prompt will repeat
+until you enter a name that exists. Additional prompts will continue
+to appear as long as there are unmatched names. Once all names have
+been matched the program will continue with the review phase. All name
+associations are stored in a file called `aliases.txt` in directory in
+which you ran the program. If you run the program again from the same
+location you will not be prompted for name matching again. If you made
+a mistake when matching names either edit the `aliases.txt` directly
+in a text editor (e.g. WordPad, Notepad, Emacs, Vim, Sublime
+Text... anything but MS Word, MS Word is *not* a text editor) or
+delete the file and start over.
+
+### Review phase
+
+One all names are matched to people in the gradebook the program will enter review mode:
+
+```
+Joseph Smith (2:00 Tu/Th, Team 1)
+        Interpersonal Relationships: 3.0
+        Team Dynamics: 2.8
+        Team Planning: 2.3
+        Interdependence: 3.0
+
+        "I came to all the meetings and I always did what I was told."
+
+        "Joe came to all the meetings and did what he was told"
+
+        "Joe missed many meetings and once I told him to bring
+        me coffee and he didn't"
+
+        peer subtotal: 11.1
+        submission: 3
+Instructor score for Joseph Smith (4.0):
+```
+
+If you see a number in parenthesis in the prompt to enter the
+instructor's score this is a value that has already been recorded,
+either by running the program previously or manually entering a grade
+in gradebook. Pressing `Enter` will retain the original
+value. Entering a new score and pressing enter will update the points
+to the most recently entered value.
+
+If no score exists you will not see any number or parenthesis and will
+be required to enter a point value. The prompt will continue to appear
+until you enter a valid numeric value.
+
+```
+        peer subtotal: 11.1
+        submission: 3
+Instructor score for Joseph Smith (4.0): 3.8
+Instructor comments for Joseph Smith: Joe should have not let everyone tell him what to do
+```
+
+Currently it is not possible to enter multi-line comments, pressing
+`Enter` will finish the comment and move on to the next review.
+
+Once you enter a score and comment for the last person everything will
+be recorded to the gradebook file you specified on startup:
+
+```
+Grades and comments written to ENGE__gradebook.csv, item name 'Manager's Review 2'
+```
+
+### Upload to scholar
+
+Go to gradebook on Scholar, select *Import* and set the options to
+import *No-structure (grades only)*, select the file that scores were
+saved to and click *Next*.  Both scores and comments will be imported
+into Gradebook under the item you created for this assignment.
 
 ## Exporting data from Scholar
 
