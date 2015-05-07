@@ -190,7 +190,7 @@ def collect_responses(responses, reviews, reviewee, gradebook, args):
         return review.section + review.group + review.full_name
     
     for review in sorted(reviews, key=section_team_name):
-        print("record for {}".format(review.pid))
+        print("")
         record = [ record for record in gradebook.records if record.pid == review.pid][0]
         score = record.score_for(args.name)
         try:
