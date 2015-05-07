@@ -5,6 +5,7 @@
 1. [Export files from Scholar](#exporting-data-from-scholar)
     1. Export your manager's review scores, then save as CSV
     1. Export your gradebook, select "No-structure (grades only)" and "CSV"
+        1. If you are on the common site, select only your section to export
 1. [Download](https://www.python.org/downloads/) and install the latest stable release of Python 3 (on windows be sure to select the 64 bit installer)
 1. [Download the zip archive](https://github.com/hazybluedot/manager_review/archive/master.zip)
    of this repository by clicking the button on the right side of the
