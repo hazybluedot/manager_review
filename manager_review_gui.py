@@ -7,6 +7,9 @@ from tkinter import constants
 from tkinter.tix import LabelEntry
 from manager_review import run
 
+encoding_options = ( 'utf-8', 'utf-16' )
+delimiter_options = { ',': ',', '<tab>': '\t' }
+
 class Arguments:
     def __init__(self):
         self.interactive = True
@@ -43,33 +46,58 @@ class Arguments:
     @gradebook.setter
     def gradebook(self, infile):
         self.__gradebook = infile
+
+def set_input_file(callback):
+    def _wrapper():
+        fname = askopenfilename(filetypes=(("CSV files", "*.csv"),
+                                           ("TXT files", "*.txt"),
+                                       ))
+        if fname:
+            callback(fname)
+    return _wrapper
+
+class FileSelect:
+    def __init__(self, Frame, text, row, **kwargs):
+        self.attr = text.lower().replace(' ','_')
+        self.label = Label(Frame, text=text).grid(row=row, sticky=W)
+        self.button = Button(Frame,
+                             text="Browse",
+                             command=set_input_file(lambda x: setattr(self, 'file_name', x)),
+                             width=10).grid(row=row, column=1)
+        self.var_choice_encoding = StringVar()
+        self.var_choice_encoding.set(encoding_options[0])
+        self.optionmenu_encoding = OptionMenu(Frame, self.var_choice_encoding, *encoding_options).grid(row=row,column=2)
+
+        self.var_choice_delimiter = StringVar()
+        self.var_choice_delimiter.set(',')
+        self.optionmenu_delimiter = OptionMenu(Frame, self.var_choice_delimiter, *delimiter_options.keys()).grid(row=row, column=3)
         
+        self.frame = Frame
+
+    def get(self):
+        return (self.file_name, self.var_choice_encoding.get(), delimiter_options[self.var_choice_delimiter.get()])
+                
 class Application(Frame):
     def run_with_args(self):
         self.args.name = self.item_name.get()
         self.args.submission_points = float(self.submission_points.get())
+        (self.args.input_file, self.args.input_file_encoding, self.args.input_file_delimiter) = self.fileselect_input.get()
+        (self.args.gradebook, self.args.gradebook_encoding, self.args.gradebook_delimiter) = self.fileselect_gradebook.get()
         return run(self.args)
         
     def createWidgets(self):
 
         button_opt = {'padx': 5, 'pady': 5}
 
-        self.input_label = Label(self, text="input file").grid(row=0, sticky=W)
-        self.gradebook_label = Label(self, text="gradebook file").grid(row=1, sticky=W)
+        self.fileselect_input = FileSelect(self, 'input_file', 0)
+        self.fileselect_gradebook = FileSelect(self, 'gradebook file', 1)
 
-        self.input_button = Button(self, text="Browse", command=self.set_input_file, width=10)  
-        self.input_button.grid(row=0, column=1, **button_opt)
-
-        self.gradebook_button = Button(self, text="Browse", command=self.set_gradebook_file, width=10)  
-        self.gradebook_button.grid(row=1, column=1, **button_opt)
-
-        self.gradebook_item_label = Label(self, text="Gradebook item name").grid(row=2, sticky=W)
-        self.gradebook_itemname = Entry(self, textvariable=self.item_name).grid(row=2, column=1)
-        self.gradebook_item_message = Label(self, text="Must match the name of the item in your gradebook exactly").grid(row=3, columnspan=2)
-
+        self.label_item_name = Label(self, text="Gradebook item name").grid(row=3, sticky=W)
+        self.entry_item_name = Entry(self, textvariable=self.item_name).grid(row=3, column=1)
+        
         self.label_submission_points = Label(self, text="Points for submission").grid(row=4, sticky=W)
         self.entry_submission_points = Entry(self, textvariable=self.submission_points).grid(row=4, column=1)
-
+        
         self.run = Button(self)
         self.run["text"] = "Go",
         self.run["command"] = self.run_with_args
@@ -81,16 +109,6 @@ class Application(Frame):
         self.QUIT["command"] =  self.quit
 
         self.QUIT.grid(row=5, column=2)
-        
-    def set_input_file(self):
-        fname = askopenfilename(filetypes=(("CSV files", "*.csv"),
-                                           ))
-        self.args.input_file = fname
-        
-    def set_gradebook_file(self):
-        fname = askopenfilename(filetypes=(("CSV files", "*.csv"),
-                                           ))
-        self.args.gradebook = fname
         
     def __init__(self, master=None):
         Frame.__init__(self, master, borderwidth=5)
