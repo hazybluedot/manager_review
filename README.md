@@ -2,18 +2,24 @@
 
 ## TLDR
 
+1. [Export files from Scholar](#exporting-data-from-scholar)
+    1. Export your manager's review scores, then save as CSV
+    1. Export your gradebook, select "No-structure (grades only)" and "CSV"
 1. [Download](https://www.python.org/downloads/) and install the latest stable release of Python 3 (on windows be sure to select the 64 bit installer)
-2. [Download the zip archive](https://github.com/hazybluedot/manager_review/archive/master.zip)
+1. [Download the zip archive](https://github.com/hazybluedot/manager_review/archive/master.zip)
    of this repository by clicking the button on the right side of the
    page
-3. Extract the downloaded archive, open the folder that was created and double click `manager_review_gui.py`
-4. After browsing for the necessary input Tests&Quizzes CSV and
-   gradebook CSV files (export these from Scholar, you will have to
-   save the Tests&Quizzes `xls` file as `csv`) and entering the
-   correct gradebook item name, press 'Go'
-5. All subsequent input will be done through the command
+1. Extract the downloaded archive, open the folder that was created and double click `manager_review_gui.py`
+1. For the input file click 'Browse' and select the CSV file containing your manager's review scores
+1. For the gradebook file click 'Browse' and select the CSV file containing your gradebook export
+1. All subsequent input will be done through the command
    window. During data entry you may press `Ctrl+C` and then `Enter`
    to cancel and save any changes so far.
+   1. If the program can't match a reveiwee's name to one in the gradebook (i.e. a reviewer used a nick name or made a typo) you will see a prompt like
+       ````
+       Who is Joe Smith?
+       ````
+       Simply type in the full name, first then last, of the person and press `Enter` to continue. Once all ambiguous names have been resolved the review process will start.
 
 ## Requirements
 
