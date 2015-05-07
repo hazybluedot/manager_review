@@ -19,13 +19,21 @@
 1. All subsequent input will be done through the command
    window. During data entry you may press `Ctrl+C` and then `Enter`
    to cancel and save any changes so far.
-   1. If the program can't match a reveiwee's name to one in the gradebook (i.e. a reviewer used a nick name or made a typo) you will see a prompt like
+   1. If the program can't match a reveiwee's name to one in the
+      gradebook (i.e. a reviewer used a nick name or made a typo) you
+      will see a prompt like
 
        ````
-       Who is Joe Smith?
+       In section 2:00 Tu/Th, Team 1 who is Joe Smith?
        ````
 
-       Simply type in the full name, first then last, of the person and press `Enter` to continue. Once all ambiguous names have been resolved the review process will start.
+       Simply type in the full name, first then last, of the person
+       and press `Enter` to continue. See
+       [Name association](#name-association) for more details about
+       this phase.
+
+    1. Once all ambiguous names have been resolved the
+       [review process will start](#review-phase).
 
 ## Requirements
 
@@ -111,11 +119,15 @@ can specify an alternate file using the `--aliases` command option.
 
 ```
 > python3 manager_review.py -h
+usage: manager_review.py [-h] [--interactive] [--gradebook GRADEBOOK]
+                         [--name NAME] [--aliases ALIASES] [--comments]
+                         [--submission-points SUBMISSION_POINTS]
+                         input_file
 ```
 
 Will display all available options.
 
-### Name Association
+### Name association
 
 The first thing you are likely to see once the program is invoked via
 either the command line or GUI is the name association prompt. This
@@ -222,29 +234,3 @@ into Gradebook under the item you created for this assignment.
 3. From the *Action* drop down to the left of the quiz for the manager review select "Scores"
 4. Once the scores page loads click the *Export* link and then the *Export* button
 5. Open the downloaded file in your spreadsheet program of choice and save as a CSV file.
-
-## Windows users
-
-If you added *python.exe* to the search path when installing Python
-you should be able to run the following command (`>` denotes the
-command prompt, don't type that):
-
-```
-> python.exe manager_review.py
-```
-
-If all is working you should see the help text for the program
-
-```
-usage: manager_review.py [-h] [--interactive] [--gradebook GRADEBOOK]
-                         [--name NAME] [--aliases ALIASES] [--comments]
-                         [--submission-points SUBMISSION_POINTS]
-                         input_file
-```
-
-If you did not add *python.exe* to the search path when you installed
-Python you will have to specify the full path to the python executable
-when running python programs for the command line. For the latest
-released of Python 3 this should be `C:\Python34\python.exe`. If the
-above command results in an error replace `python.exe` with the
-`C:\Python34\python.exe` and try again.
