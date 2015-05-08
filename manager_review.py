@@ -8,7 +8,7 @@ from os import name as os_name
 from app.corrector import Corrector
 from app.person import people_finder
 from scholar import tests_quizzes as tq
-from scholar.gradebook import Gradebook
+from scholar.gradebook import open_gradebook, Gradebook, NoSuchRecord, NoSuchItem
 from scholar.person import Person
 from util import flatten_list, label_to_attr, num_or_none
 
@@ -239,6 +239,15 @@ def collect_responses(responses, reviews, reviewee, gradebook, args):
         print("Total points for {}: {}".format(review.full_name, review.points))
             #print("{}: {}".format(result.full_name, [ result.response(p,1).response for p in range(2,8) ]))
 
+def dump_reviews(fname, reviews):
+    def quote(s):
+        return '"' + s + '"'
+    
+    with open(fname, 'w', encoding='utf-8') as f:
+        f.write(','.join(['pid','points','comments']) + '\n')
+        for review in reviews:
+            f.write(','.join([review.pid, review.points, quote(review.comments)]) + '\n')
+            
 def run(args):
     qs = tq.QuizSubmissions(args.input_file,
                             response_filter=response_filter,
@@ -255,7 +264,7 @@ def run(args):
     gradebook = None
     if args.gradebook and args.name:
         try:
-            gradebook = Gradebook(args.gradebook, encoding=args.gradebook_encoding, delimiter=args.gradebook_delimiter)
+            gradebook = Gradebook(args.gradebook, 'r', encoding=args.gradebook_encoding, delimiter=args.gradebook_delimiter)
         except FileNotFoundError as e:
             stderr.write('No such file: {}\n'.format(args.gradebook))
 
@@ -278,17 +287,19 @@ def run(args):
     collect_responses(responses, reviews, reviewee, gradebook, args)
     
     if args.gradebook and args.name:
-        try:
-            gradebook = Gradebook(args.gradebook)
-        except FileNotFoundError as e:
-            stderr.write('No such file: {}\n'.format(args.gradebook))
-        else:
-            gradebook.update_item(args.name, reviews)
-            gradebook.write(args.gradebook)
-            stdout.write('Grades')
-            if args.comments:
-                stdout.write(' and comments')
-            stdout.write(" written to {}, item name '{}'\n".format(args.gradebook, args.name))
+        with open_gradebook(args.gradebook, 'w') as gradebook:
+            try:
+                gradebook.update_item(args.name, reviews)
+            except NoSuchRecord as e:
+                stderr.write('{}\n'.format(e.message))
+                dump_file = 'reviews_abort_on_gradebook_error.csv'
+                dump_reviews(dump_file, reviews)
+                stderr.write('Grades and comments written to {}\n'.format(dump_file))
+            else:    
+                stdout.write('Grades')
+                if args.comments:
+                    stdout.write(' and comments')
+                stdout.write(" written to {}, item name '{}'\n".format(args.gradebook, args.name))
             
 if __name__ == '__main__':
     import sys

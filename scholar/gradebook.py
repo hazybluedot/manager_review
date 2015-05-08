@@ -11,8 +11,27 @@ gradebook_comment_regex = re.compile(r'Comment\s+:\s+([^()]+)$')
 def comment_key(item_name):
     return "Comment : " + item_name
 
-class NoSuchItem(Exception):
-    pass
+class GradebookError(Exception):
+    def __init__(self, message):
+        self.message = message
+        
+    def __str__(self):
+        return self.message
+    
+class NoSuchItem(GradebookError):
+    def __init__(self, item_name):
+        self.item_name
+        super().__init__('{}: no such grade item'.format(self.item_name))
+
+    def __str__(self):
+        return self.message
+
+class NoSuchRecord(GradebookError):
+    def __init__(self, attr_name, rvalue):
+        self.attr_name = attr_name
+        self.rvalue = rvalue
+        super().__init__("{}: no record with value of '{}'".format(self.attr_name, self.rvalue))
+
 
 class GradebookItem:
     def __init__(pid, name):
@@ -145,10 +164,12 @@ def object_to_dict(obj, fieldnames):
     return { key: obj[key] for key in fieldnames }
 
 class Gradebook:    
-    def __init__(self, csvfile, **kwargs):
+    def __init__(self, csvfile, mode, **kwargs):
         self.encoding = kwargs.pop('encoding', 'utf8')
         self.delimiter = kwargs.pop('delimiter', ',')
-        self.read(csvfile, **kwargs)
+        self.mode = mode
+        self.csvfile = csvfile
+        self.read(self.csvfile, **kwargs)
 
     def read(self, filename, **kwargs):
         with open(filename, 'r', encoding=self.encoding) as f:
@@ -158,29 +179,31 @@ class Gradebook:
             self.records = [ record_from_row(row, self.items) for row in reader ]
 
     def get_item(self, item_name):
-        item = None
-        for _item in self.items:
-            if item_name == _item.name:
-                item = _item
-                
-        if item is None:
+        try:
+            item = [ item for item in self.items if item.name == item_name ][0]
+        except IndexError:
             raise NoSuchItem(item)
         return item
 
     def has_item(self, item_name):
         try:
-            return self.get_item(item_name)
+            self.get_item(item_name)
         except NoSuchItem:
-            return None
-    
+            return False
+        else:
+            return True
+
     def record_for(self, attr_name, rvalue):
-        record = [ record for record in self.records if getattr(record, attr_name, None) == rvalue ][0]
+        try:
+            record = [ record for record in self.records if getattr(record, attr_name, None) == rvalue ][0]
+        except IndexError:
+            raise NoSuchRecord(attr_name, rvalue)
         return record
-            
+
     def records_for(self, item_name):
         item = self.get_item(item_name)
         records = [ record.items[item_name] for record in self.records ]
-        
+
     def update_item(self, item_name, scores):
         item = self.get_item(item_name)
         for s in scores:
@@ -196,17 +219,27 @@ class Gradebook:
             fields.append(item.comment_label)
         fields = fields + tail_headers
         return fields
-    
+
     def write(self, filename):
         with open(filename, 'w', newline='', encoding=self.encoding) as f:
             writer = csv.DictWriter(f, fieldnames=self.fieldnames, delimiter=self.delimiter)
             writer.writeheader()
             for record in self.records:
                 writer.writerow(object_to_dict(record, self.fieldnames))
-                
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        if self.mode == 'w':
+            self.write(self.csvfile)
+
     def __repr__(self):
         return "items: {}".format(self.items)
-    
+
+def open_gradebook(fname, mode, **kwargs):
+    return Gradebook(fname, mode, **kwargs)
+
 if __name__ == '__main__':
     from sys import argv
     
