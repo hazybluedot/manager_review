@@ -1,6 +1,6 @@
 # Manager's Review Processor
 
-## TLDR
+## Overview
 
 1. [Download](https://www.python.org/downloads/) and install the latest stable release of Python 3 (on windows be sure to select the 64 bit installer)
 1. [Export files from Scholar](#exporting-data-from-scholar)
