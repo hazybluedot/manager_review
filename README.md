@@ -38,7 +38,8 @@
 
     1. Once all ambiguous names have been resolved the
        [review process will start](#review-phase).
-
+1. Back on Scholar gradebook, *Import* the gradebook csv file. Both grades and comments will be uploaded.
+       
 ## Requirements
 
 ### Python
