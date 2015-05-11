@@ -13,6 +13,8 @@ from scholar.gradebook import open_gradebook, Gradebook, NoSuchRecord, NoSuchIte
 from scholar.person import Person
 from util import flatten_list, label_to_attr, num_or_none
 
+conencoding = stdout.encoding
+
 question_number_map = { 2: 'Interdependence',
                         3: 'Team Planning',
                         4: 'Team Dynamics',
@@ -208,18 +210,14 @@ def collect_responses(responses, reviews, reviewee, gradebook, args):
         print("\t")
         for comment in review.peer_comments:
             try:
-                comment_lines = textwrap.wrap('"' + comment + '"',72)
+                comment_lines = textwrap.wrap('"{}"'.format(comment),72)
             except AttributeError:
                 stderr.write('AttributeError: {}, {}: attempt to wrap "{}"\n'.format(person.full_name, label, comment).encode('utf-8'))
             except TypeError:
                 stderr.write('TypeError: {}, {}: attempt to wrap "{}"\n'.format(person.full_name, label, comment).encode('utf-8'))
             else:
                 for comment in comment_lines:
-                    try:
-                        print('\t{}'.format(comment))
-                    except UnicodeEncodeError as e:
-                        print('\t{}'.format(comment.encode('utf-8')))
-                        #stdout.write('\t--{}\n\n'.format(review.full_name))
+                    print('\t{}'.format(comment.encode(conencoding, errors='replace').decode(conencoding)))
 
         peer_subtotal = sum(review.scores.values())
         print("\t")
