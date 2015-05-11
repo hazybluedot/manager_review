@@ -28,10 +28,16 @@
       will see a prompt like
 
        ````
-       In section 2:00 Tu/Th, Team 1 who is Joe Smith?
+       In section 12:30 Tu/Th, Team 3 who is "Joe Schmoe"?
+       1) Joeseph Schmoe
+       2) Sean Penn
+       3) John Cusack
+       4) Emma Watson
+       5) Kevin Smith
+       Choose one or write in: 
        ````
 
-       Simply type in the full name, first then last, of the person
+       Simply type the number of the correct name, or type a different name, first then last, of the person
        and press `Enter` to continue. See
        [Name association](#name-association) for more details about
        this phase.
@@ -145,27 +151,39 @@ names in the gradebook. This could be due to spelling errors or
 nicknames.
 
 ````
-In section 2:00 Tu/Th, Team 1 who is "Joe Smith"?
+In section 2:00 Tu/Th, Team 3 who is "Joe Schmoe"?
+1) Joeseph Schmoe
+2) Sean Penn
+3) John Cusack
+4) Emma Watson
+5) Kevin Smith
+Choose one or write in: 
 ````
 
 Determine the full name of the student referenced and type it at the prompt and press `Enter`
 
 ````
-In section 2:00 Tu/Th, Team 1 who is "Joe Smith"? Joseph Smith
-In section 12:30 Tu/Th, Team 5 who is "Sue Lee"?
+In section 2:00 Tu/Th, Team 3 who is "Joe Schmoe"?
+1) Joeseph Schmoe
+2) Sean Penn
+3) John Cusack
+4) Emma Watson
+5) Kevin Smith
+Choose one or write in: 1
 ````
 
-If the name you enter isn't found in gradebook the prompt will repeat
-until you enter a name that exists. Additional prompts will continue
-to appear as long as there are unmatched names. Once all names have
-been matched the program will continue with the review phase. All name
-associations are stored in a file called `aliases.txt` in directory in
-which you ran the program. If you run the program again from the same
-location you will not be prompted for name matching again. If you made
-a mistake when matching names either edit the `aliases.txt` directly
-in a text editor (e.g. WordPad, Notepad, Emacs, Vim, Sublime
-Text... anything but MS Word, MS Word is *not* a text editor) or
-delete the file and start over.
+When entering a name manually, if the name you enter isn't found in
+gradebook the prompt will repeat until you enter a name that
+exists. Additional prompts will continue to appear as long as there
+are unmatched names. Once all names have been matched the program will
+continue with the review phase. All name associations are stored in a
+file called `aliases.txt` in directory in which you ran the
+program. If you run the program again from the same location you will
+not be prompted for name matching again. If you made a mistake when
+matching names either edit the `aliases.txt` directly in a text editor
+(e.g. WordPad, Notepad, Emacs, Vim, Sublime Text... anything but MS
+Word, MS Word is *not* a text editor) or delete the file and start
+over.
 
 ### Review phase
 
