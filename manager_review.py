@@ -210,12 +210,16 @@ def collect_responses(responses, reviews, reviewee, gradebook, args):
             try:
                 comment_lines = textwrap.wrap('"' + comment + '"',72)
             except AttributeError:
-                stderr.write('AttributeError: {}, {}: attempt to wrap "{}"\n'.format(person.full_name, label, comment))
+                stderr.write('AttributeError: {}, {}: attempt to wrap "{}"\n'.format(person.full_name, label, comment).encode('utf-8'))
             except TypeError:
-                stderr.write('TypeError: {}, {}: attempt to wrap "{}"\n'.format(person.full_name, label, comment))
+                stderr.write('TypeError: {}, {}: attempt to wrap "{}"\n'.format(person.full_name, label, comment).encode('utf-8'))
             else:
-                stdout.writelines( [ '\t' + comment + '\n' for comment in comment_lines ])
-                #stdout.write('\t--{}\n\n'.format(review.full_name))
+                for comment in comment_lines:
+                    try:
+                        print('\t{}'.format(comment))
+                    except UnicodeEncodeError as e:
+                        print('\t{}'.format(comment.encode('utf-8')))
+                        #stdout.write('\t--{}\n\n'.format(review.full_name))
 
         peer_subtotal = sum(review.scores.values())
         print("\t")
