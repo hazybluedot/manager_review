@@ -4,6 +4,7 @@ from sys import stdout, stderr
 from itertools import groupby
 import textwrap
 from os import name as os_name
+from datetime import datetime
 
 from app.corrector import Corrector
 from app.person import people_finder
@@ -214,6 +215,8 @@ def collect_responses(responses, reviews, reviewee, gradebook, args):
                 stderr.write('TypeError: {}, {}: attempt to wrap "{}"\n'.format(person.full_name, label, comment))
             else:
                 stdout.writelines( [ '\t' + comment + '\n' for comment in comment_lines ])
+                #stdout.write('\t--{}\n\n'.format(review.full_name))
+
         peer_subtotal = sum(review.scores.values())
         print("\t")
         print("\tpeer subtotal: {:0.2f}".format(peer_subtotal))
@@ -286,6 +289,7 @@ def run(args):
 
     collect_responses(responses, reviews, reviewee, gradebook, args)
     
+    dump_reviews('reviews_backup_{}.csv'.format(datetime.now().strftime('%Y%m%d_%H%M%S')), reviews)
     if args.gradebook and args.name:
         with open_gradebook(args.gradebook, 'w') as gradebook:
             try:
